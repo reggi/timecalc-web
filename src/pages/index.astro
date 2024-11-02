@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Submit and Process</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css"
+			rel="stylesheet"
+		/>
+	</head>
+	<body class="bg-gray-900 pt-16">
+		<form
+			id="dataForm"
+			class="flex flex-col items-center space-y-4 bg-gray-700 p-6 rounded mx-auto mb-3"
+			style="max-width: 600px;"
+		>
+			<textarea
+				id="inputText"
+				placeholder="Enter your text"
+				class="w-full bg-gray-800 text-white p-2 text-lg rounded text-center"
+				style="font-size: 20px; min-height: 200px;"></textarea>
+			<button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
+				Submit
+			</button>
+		</form>
+
+		<div
+			class="flex flex-col items-center space-y-4 bg-gray-700 p-6 rounded mx-auto"
+			style="max-width: 600px;"
+		>
+			<h1 class="text-2xl text-white">Results</h1>
+			<p
+				id="result"
+				class="text-white"
+				style="font-size: 20px; min-height: 20px"
+			>
+			</p>
+		</div>
+
+		<script>
+			const dataForm = document.getElementById("dataForm");
+			const inputTextElement = document.getElementById("inputText");
+
+			const exe = () => {
+				const inputTextElement = document.getElementById("inputText");
+				const resultElement = document.getElementById("result");
+				if (inputTextElement && resultElement) {
+					const inputText = (inputTextElement as HTMLInputElement).value;
+					const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+					fetch(
+						`/api?timezone=${encodeURIComponent(timezone)}&expression=${encodeURIComponent(inputText)}`,
+					)
+						.then((response) => response.json())
+						.then((data) => {
+							const resultText = data.results;
+							resultElement.textContent = resultText;
+						})
+						.catch((error) => {
+							console.error("Error:", error);
+							resultElement.textContent = "An error occurred";
+						});
+				}
+			};
+
+			inputTextElement?.addEventListener("keydown", function (event) {
+				if (event.key === "Enter" && !event.shiftKey) {
+					event.preventDefault(); // Prevent default to stop new line
+					exe();
+				}
+			});
+
+			if (dataForm) {
+				dataForm.onsubmit = function (event) {
+					event.preventDefault();
+					exe();
+				};
+			}
+		</script>
+	</body>
+</html>
