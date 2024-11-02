@@ -42,6 +42,17 @@
 			const dataForm = document.getElementById("dataForm");
 			const inputTextElement = document.getElementById("inputText");
 
+			const getQueryParam = (param) => {
+				const urlParams = new URLSearchParams(window.location.search);
+				return urlParams.get(param);
+			};
+
+			const updateQueryParam = (param, value) => {
+				const url = new URL(window.location);
+				url.searchParams.set(param, value);
+				window.history.replaceState({}, "", url);
+			};
+
 			const exe = () => {
 				const inputTextElement = document.getElementById("inputText");
 				const resultElement = document.getElementById("result");
@@ -64,6 +75,10 @@
 				}
 			};
 
+			inputTextElement?.addEventListener("input", function () {
+				updateQueryParam("query", inputTextElement.value);
+			});
+
 			inputTextElement?.addEventListener("keydown", function (event) {
 				if (event.key === "Enter" && !event.shiftKey) {
 					event.preventDefault(); // Prevent default to stop new line
@@ -76,6 +91,13 @@
 					event.preventDefault();
 					exe();
 				};
+			}
+
+			// Prepopulate the textarea with the query parameter "query"
+			const queryParam = getQueryParam("query");
+			if (queryParam) {
+				inputTextElement.value = queryParam;
+				exe(); // Run the fetch call on load with the query
 			}
 		</script>
 	</body>
